@@ -1,0 +1,23 @@
+{
+  "name": "doorman-trainer",
+  "version": "0.1.0",
+  "description": "Doorman Trainer: a Deadlock custom game mode to practise Doorman's kidnap",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BeeeFX/DoormanTrainer.git"
+  },
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "modlock dev",
+    "build": "modlock build",
+    "check": "tsc -p .",
+    "test": "esbuild tests/logic.test.ts --bundle --platform=node --alias:modlock=./tests/stub/modlock.ts --outfile=tests/.out/logic.test.js --log-level=warning && node tests/.out/logic.test.js"
+  },
+  "devDependencies": {
+    "@modlock/modlock": "^0.1.97",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.3"
+  }
+}

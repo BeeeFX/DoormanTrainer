@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+stage/
+stage-zip/
+tests/.out/
+*.log
+*.zip
+.env
+.vscode/
+.idea/
+.claude/settings.local.json

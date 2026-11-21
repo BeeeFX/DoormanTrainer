@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["es2023"],
+    "types": [],
+    "jsx": "react-jsx",
+    "jsxImportSource": "modlock",
+    "strict": true,
+    "noEmit": true,
+    "paths": {
+      "modlock": ["./node_modules/@modlock/modlock/index.d.ts"],
+      "modlock/*": ["./node_modules/@modlock/modlock/*"]
+    }
+  },
+  "include": ["main.ts", "src/**/*.ts", "src/**/*.tsx", "node_modules/@modlock/modlock/globals.d.ts"],
+  "exclude": ["build"]
+}
