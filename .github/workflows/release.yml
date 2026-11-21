@@ -36,7 +36,11 @@ jobs:
         run: npm test
 
       - name: Package the mod (modlock.exe, the mod, Play.cmd)
-        run: npx modlock publish --to archive --out dist
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          npx modlock publish --to archive --out dist
+          if ($LASTEXITCODE -ne 0) { throw "modlock publish failed" }
 
       - name: Stage files for the installer
         shell: pwsh
