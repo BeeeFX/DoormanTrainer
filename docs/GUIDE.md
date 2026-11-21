@@ -59,13 +59,17 @@ Walking bots strafe around their spot, with jumps, slides and dashes on the move
 
 **Do I need an internet connection?** Yes, for the in-game menu, which loads through Modlock's page.
 
-**I clicked "Leave testing" and ended up in the hideout.** That leaves the trainer. Close the trainer's window and double-click **Doorman Trainer** again, or type `connect 127.0.0.1:27067` in the game console.
+**I clicked "Leave testing" and ended up in the hideout.** That leaves the trainer. Quit Deadlock and double-click **Doorman Trainer** again, or type `connect 127.0.0.1:27067` in the game console.
 
 **There's no menu.** Only one trainer can run at a time. Close every trainer window and start it again.
 
 **A kidnap didn't count.** Turn on Settings → Debug overlay to see what the trainer saw, and [open an issue](https://github.com/BeeeFX/DoormanTrainer/issues) with the spot and what happened.
 
 **I got put inside a wall or under the map.** Type `/badspot` during that try. The spot is hidden for good and you move on. Locations can bring hidden spots back.
+
+**How do I update?** You don't need to: each time you start Doorman Trainer it checks for a new version and installs it first. If you're offline it just starts the version you have.
+
+**How do I stop it?** Quit Deadlock and the trainer's window closes by itself. Closing that window also stops the trainer.
 
 **Where are my settings and scores?** In `%APPDATA%\modlock\files\doorman-trainer`. Uninstalling keeps them.
 

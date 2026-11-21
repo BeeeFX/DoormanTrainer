@@ -33,7 +33,8 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-CloseApplications=yes
+; The launcher installs updates silently while it runs: never close apps.
+CloseApplications=no
 
 [Tasks]
 Name: "desktopicon"; Description: "Put a shortcut on the desktop"; GroupDescription: "Shortcuts:"
@@ -42,6 +43,7 @@ Name: "desktopicon"; Description: "Put a shortcut on the desktop"; GroupDescript
 Source: "{#Source}\modlock.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#Source}\mod\*"; DestDir: "{app}\mod"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Doorman Trainer.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "launcher.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [InstallDelete]

@@ -41,7 +41,7 @@ Place your doors, cart them through, and go again, as many times as you like.
 2. **Double-click Doorman Trainer** on your desktop. Deadlock opens straight into the trainer.
 3. **Play.** Place door 1, then door 2, then cart someone through. Tap **Reload** to retry or **Jump** for the next one.
 
-Want to play Deadlock normally? Just launch it from Steam like always.
+It keeps itself up to date, and closes when you quit Deadlock. Want to play Deadlock normally? Just launch it from Steam like always.
 
 ## What's inside
 

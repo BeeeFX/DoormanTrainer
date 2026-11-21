@@ -68,7 +68,9 @@ The sandbox saves settings to the same place as the real game (`%APPDATA%\modloc
 
 The [Release workflow](../.github/workflows/release.yml) checks that the tag matches `mod.json`, runs the type check and tests, and packages the mod with `modlock publish --to archive`. That zip holds `modlock.exe`, the built mod and `Play.cmd`. The workflow builds the installer from it with Inno Setup, then publishes a release with two files:
 
-- `DoormanTrainer-win-Setup.exe`: installs for the current user (no admin prompt), with a Start menu and desktop shortcut that run `installer/Doorman Trainer.cmd`, which runs `modlock.exe play mod`.
+- `DoormanTrainer-win-Setup.exe`: installs for the current user (no admin prompt), with a Start menu and desktop shortcut that run `installer/Doorman Trainer.cmd`. That runs `installer/launcher.ps1`, which installs a newer release silently if GitHub has one, runs `modlock.exe play mod`, and stops it when Deadlock closes.
+
+Try the launcher without the game: `powershell -ExecutionPolicy Bypass -Command "& .\installer\launcher.ps1 -NoUpdate -Trainer powershell.exe -TrainerArgs '-Command','Start-Sleep 600' -Game notepad"` follows Notepad instead of Deadlock.
 - `DoormanTrainer-win-Portable.zip`: Modlock's zip, renamed. Unzip it and run `Play.cmd`.
 
 The README's download button points at `releases/latest/download/DoormanTrainer-win-Setup.exe`, so keep that file name.

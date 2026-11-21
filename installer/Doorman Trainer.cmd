@@ -1,18 +1,6 @@
 @echo off
-rem Starts Deadlock straight into Doorman Trainer. The installer's shortcuts
-rem point here. To play Deadlock normally, launch it from Steam as usual.
-title Doorman Trainer
-cd /d "%~dp0"
-echo.
-echo   Doorman Trainer
-echo   ---------------
-echo   Starting Deadlock in the trainer. Steam needs to be running.
-echo   Keep this window open while you train; close it when you're done.
-echo.
-modlock.exe play mod
-if errorlevel 1 (
-  echo.
-  echo   Something went wrong. The lines above say what.
-  echo   Help: https://github.com/BeeeFX/DoormanTrainer#questions
-  pause
-)
+rem Starts Deadlock straight into Doorman Trainer; the installer's shortcuts
+rem point here. The work is in launcher.ps1: update, start, stop with the game.
+rem One line on purpose: an update rewrites this file while it runs, and cmd
+rem reads a batch file as it goes.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0launcher.ps1" & exit /b
