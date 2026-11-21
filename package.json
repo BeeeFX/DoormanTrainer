@@ -1,6 +1,6 @@
 {
   "name": "doorman-trainer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Doorman Trainer: a Deadlock custom game mode to practise Doorman's kidnap",
   "license": "MIT",
   "repository": {

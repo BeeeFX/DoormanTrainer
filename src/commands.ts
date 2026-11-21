@@ -214,7 +214,10 @@ export function registerCommands(): void {
   // ---- tuning and diagnostics ----
   command('where', (p) => {
     const pawn = p.pawn()
-    if (pawn) say(p, `pos ${fmtVec(pawn.position)} angles ${fmtAng(pawn.eyeAngles)}`)
+    if (!pawn) return
+    const at = `pos ${fmtVec(pawn.position)} angles ${fmtAng(pawn.eyeAngles)}`
+    say(p, at)
+    log(`/where: ${at}`)
   })
   command('probe', (p) => {
     for (const ab of p.abilities()) p.chat(`ability slot ${ab.slot}: ${ab.name} (upgrades ${ab.upgrades})`)

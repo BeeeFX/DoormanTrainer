@@ -1,12 +1,12 @@
 // Doorman Trainer: drills for Doorman, starting with the door + Luggage Cart "kidnap".
 // How it works: docs/DEVELOPING.md.
 import { handleInput, keysFrame, registerKeys } from './src/keys'
-import { after, connection, onAbilityCast, onDamage, onFrame, onInput, type Player, onKill, onLaunch, onPlayerJoin, onPlayerLeave, onSpawn, onStart, onWorld, setRespawnDelay, watchProjectiles } from 'modlock'
+import { after, connection, heroNamed, onAbilityCast, onDamage, onFrame, onInput, type Player, onKill, onLaunch, onPlayerJoin, onPlayerLeave, onSpawn, onStart, onWorld, setRespawnDelay, watchProjectiles } from 'modlock'
 import { apply, arena } from 'modlock/console'
 import { onBotSpawn, removeAll } from './src/bots'
 import { registerCommands } from './src/commands'
 import { settings } from './src/config'
-import { generateBuiltins } from './src/locations'
+import { generateBuiltins, setMapName } from './src/locations'
 import { bossEntity, forgetBoss } from './src/boss'
 import { clearPlan, currentPhase, frame, holdBot, getHuman, onCast, onKillEvent, onProjectile, rebuildHuman, setHuman, stop } from './src/round'
 import { draw, markDirty, openMenu, resetUi } from './src/ui'
@@ -33,6 +33,7 @@ onWorld((map) => {
   // A new map removes bots; built-in locations come from this map's entities.
   removeAll()
   forgetBoss()
+  setMapName(map)
   stop()
   clearPlan()
   generateBuiltins()
@@ -54,17 +55,31 @@ onPlayerJoin(({ connection }) => {
   if (connection.bot) return
   if (!getHuman()) setHuman(connection.player)
   connection.player.seat({ hero: 'doorman', team: settings.team })
-  // The hero can be in the world already (the spawn came before the join
-  // finished): welcome now rather than waiting for a spawn that has passed.
-  if (connection.player.pawn()) welcome(connection.player)
 })
 
 // First spawn of the session: build the hero, say hello, open the menu.
+// On a fresh launch the player first gets some other hero, which the seat
+// then swaps for Doorman; a build or menu given before the swap is lost. So
+// the welcome waits until the player is Doorman, alive, for a full second.
+const DOORMAN = heroNamed('doorman')?.id
+let readySince = -1
+function welcomeCheck(t: number): void {
+  if (welcomed) return
+  const h = getHuman()
+  const p = h ? h.pawn() : undefined
+  if (!h || !p || p.health <= 0 || (DOORMAN !== undefined && p.hero !== DOORMAN)) {
+    readySince = -1
+    return
+  }
+  if (readySince < 0) readySince = t
+  if (t - readySince >= 1) welcome(h)
+}
 function welcome(player: Player): void {
   if (welcomed) return
   welcomed = true
+  log('welcome: building Doorman and opening the menu')
   rebuildHuman(true)
-  player.announce('Doorman Trainer', 'Type /dt for the menu')
+  player.announce('Doorman Trainer', 'Press E or type /dt for the menu')
   openMenu(player)
 }
 
@@ -80,6 +95,7 @@ onPlayerLeave(({ connection }) => {
     resetUi(h)
     setHuman(undefined)
     welcomed = false
+    readySince = -1
     log(`player left (${connection.name}); session reset`)
     flushSaves(true)
   }
@@ -96,10 +112,7 @@ onSpawn((player) => {
       h = player
     }
   }
-  if (h && player.slot === h.slot) {
-    welcome(player)
-    return
-  }
+  if (h && player.slot === h.slot) return // welcomeCheck() takes it from here
   onBotSpawn(player)
   // Bots that respawn between tries wait frozen instead of roaming.
   const ph = currentPhase()
@@ -122,6 +135,7 @@ onKill(onKillEvent)
 
 onFrame((f) => {
   setNow(f.timeSeconds)
+  welcomeCheck(f.timeSeconds)
   keysFrame()
   frame()
   draw(false)

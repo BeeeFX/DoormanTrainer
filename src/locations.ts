@@ -1,4 +1,4 @@
-import { entityPosition, findEntities, ground, readField, trace, Layers, vector, type Angles, type Vector } from 'modlock'
+import { entityName, entityPosition, findEntities, ground, readField, trace, Layers, vector, type Angles, type Vector } from 'modlock'
 import { doorRangeUnits, settings, type SpotFilter } from './config'
 import { dbg, fmtVec, loadJson, log, saveJson } from './util'
 
@@ -245,10 +245,40 @@ export function pitFloor(center: Vector): Vector {
   return lowestOpenFloor(center.x, center.y, center.z + 1500, center.z - 4000) ?? center
 }
 
-function midbossLocations(center: Vector, bases: Record<number, Vector | undefined>, range: number): Location[] {
+// Where the map spawns its Mid-Boss: the live Mid-Boss, else the map's
+// Mid-Boss camp (info_neutral_trooper_camp "mid_neutrals" with the
+// neutral_camp_midboss subclass), else its shield trigger. dl_midtown's map
+// file puts the spawn at (0, 0, -832), used when none of those is found.
+const KNOWN_PITS: Record<string, Vector> = { dl_midtown: { x: 0, y: 0, z: -832 } }
+let mapName = ''
+export function setMapName(name: string): void {
+  mapName = name
+}
+function midbossSpawn(): { pos: Vector; from: string } | undefined {
+  const live = findEntities('npc_super_neutral')
+  const livePos = live.length > 0 ? entityPosition(live[0])?.position : undefined
+  if (livePos) return { pos: livePos, from: 'the Mid-Boss' }
+  for (const e of findEntities('info_neutral_trooper_camp')) {
+    const name = entityName(e) ?? ''
+    const pos = entityPosition(e)?.position
+    if (pos && name.indexOf('mid_neutrals') >= 0) return { pos, from: 'the Mid-Boss camp' }
+  }
+  const shield = findEntities('trigger_midboss_shield')
+  const shieldPos = shield.length > 0 ? entityPosition(shield[0])?.position : undefined
+  if (shieldPos) {
+    const g = ground(shieldPos, { above: 0, below: 600 })
+    return { pos: g ?? shieldPos, from: 'the Mid-Boss shield' }
+  }
+  const known = KNOWN_PITS[mapName]
+  if (known) return { pos: known, from: 'the map file' }
+  return undefined
+}
+
+function midbossLocations(center: Vector, exact: boolean, bases: Record<number, Vector | undefined>, range: number): Location[] {
   const out: Location[] = []
   // Fight spots sit on the pit floor; door 1 goes up at street level on your side.
-  const floor = pitFloor(center)
+  // An exact spawn point is the floor already; a guess searches down for it.
+  const floor = exact ? (ground({ x: center.x, y: center.y, z: center.z + 100 }, { above: 0, below: 400 }) ?? center) : pitFloor(center)
   if (Math.abs(floor.z - center.z) > 100) log(`Mid-Boss pit floor ${Math.round(center.z - floor.z)} u below the map's middle`)
   for (const team of [2, 3]) {
     const ownBase = bases[team]
@@ -298,15 +328,16 @@ export function generateBuiltins(): void {
     const own = patrons.filter((p) => p.team === team).map((p) => p.pos)
     bases[team] = average(own) ?? average(walkers.filter((w) => w.team === team).map((w) => w.pos)) ?? average(guardians.filter((g) => g.team === team).map((g) => g.pos))
   }
-  let center: Vector | undefined
-  const mid = findEntities('npc_super_neutral')
-  if (mid.length > 0) center = entityPosition(mid[0])?.position
+  const spawn = midbossSpawn()
+  let center: Vector | undefined = spawn ? spawn.pos : undefined
   if (!center && bases[2] && bases[3]) center = vector.lerp(bases[2], bases[3], 0.5)
+  const mid = findEntities('npc_super_neutral')
 
   builtins = []
   builtins.push(...towerLocations('guardian', guardians, bases, range))
   builtins.push(...towerLocations('walker', walkers, bases, range))
-  if (center) builtins.push(...midbossLocations(center, bases, range))
+  if (center) builtins.push(...midbossLocations(center, spawn !== undefined, bases, range))
+  if (center) log(`Mid-Boss pit at ${fmtVec(center)} (from ${spawn ? spawn.from : 'the middle between the bases, a guess'})`)
   mapInfo = { guardians: guardians.length, walkers: walkers.length, patrons: patrons.length, midboss: mid.length > 0, bases }
   log(`map: ${guardians.length} guardians, ${walkers.length} walkers, ${patrons.length} patrons, midboss ${mid.length > 0 ? 'found' : 'not found'}; ${builtins.length} built-in locations (door range ${Math.round(range)} u)`)
   for (const team of [2, 3]) {
