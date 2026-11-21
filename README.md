@@ -3,7 +3,7 @@
 <img src="docs/banner.png" alt="Doorman Trainer: practise the kidnap. Door, door, cart, gone. A custom game mode for Deadlock" width="100%">
 
 [![Latest release](https://img.shields.io/github/v/release/BeeeFX/DoormanTrainer?display_name=tag&color=EF9F27&labelColor=15151A)](https://github.com/BeeeFX/DoormanTrainer/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/BeeeFX/DoormanTrainer/total?color=EF9F27&labelColor=15151A)](https://github.com/BeeeFX/DoormanTrainer/releases)
+[![Downloads](https://img.shields.io/github/downloads/BeeeFX/DoormanTrainer/total?label=downloads&color=EF9F27&labelColor=15151A)](https://github.com/BeeeFX/DoormanTrainer/releases)
 [![Stars](https://img.shields.io/github/stars/BeeeFX/DoormanTrainer?style=flat&color=EF9F27&labelColor=15151A)](https://github.com/BeeeFX/DoormanTrainer/stargazers)
 
 **Nail the Doorman kidnap before you need it in a real match.**
