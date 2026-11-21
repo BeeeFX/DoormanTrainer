@@ -97,14 +97,31 @@ ban.alpha_composite(door((W, H), d2[0], d2[1], 230, 380, 12))
 path = Image.new('RGBA', (W, H), (0, 0, 0, 0))
 pd = ImageDraw.Draw(path)
 x0, x1 = d1[0] + 150, d2[0] - 150
-for i in range(14):
-    t0, t1 = i / 14, (i + 0.55) / 14
-    def pt(t):
-        return (x0 + (x1 - x0) * t, H * 0.62 - math.sin(math.pi * t) * 150)
-    pd.line([pt(t0), pt(t1)], fill=AMBER_TEXT + (220,), width=10)
-# Arrow head at door 1: in through door 2, out at door 1.
-ax, ay = x0, H * 0.62
-pd.polygon([(ax - 6, ay + 4), (ax + 40, ay - 26), (ax + 30, ay + 20)], fill=AMBER_TEXT + (230,))
+LIFT = 150
+
+
+def pt(t):
+    return (x0 + (x1 - x0) * t, H * 0.62 - math.sin(math.pi * t) * LIFT)
+
+
+# Dashes from door 2 (t = 1) back toward door 1, stopping short of the
+# arrowhead so it sits on the end of the curve.
+T_END = 0.1
+DASHES = 12
+for i in range(DASHES):
+    a = T_END + (1 - T_END) * i / DASHES
+    b = T_END + (1 - T_END) * (i + 0.55) / DASHES
+    pd.line([pt(a), pt(b)], fill=AMBER_TEXT + (220,), width=10)
+# Arrowhead at door 1 (in through door 2, out at door 1), pointing along the
+# curve's direction of travel: toward smaller t.
+end = pt(T_END * 0.35)
+dx, dy = -(x1 - x0), math.pi * LIFT * math.cos(math.pi * T_END * 0.35)
+n = math.hypot(dx, dy)
+ux, uy = dx / n, dy / n  # travel direction
+px, py = -uy, ux  # perpendicular
+tip = (end[0] + ux * 40, end[1] + uy * 40)
+back = (tip[0] - ux * 70, tip[1] - uy * 70)
+pd.polygon([tip, (back[0] + px * 21, back[1] + py * 21), (back[0] - px * 21, back[1] - py * 21)], fill=AMBER_TEXT + (230,))
 ban.alpha_composite(path)
 fl = ImageDraw.Draw(ban)
 fl.line([(W * 0.56, H * 0.80), (W * 0.98, H * 0.80)], fill=AMBER + (160,), width=6)
